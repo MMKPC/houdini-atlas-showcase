@@ -1,0 +1,72 @@
+// Houdini Atlas — Scatter Surface Language starter pack
+//
+// === SNIPPET: vex_recompute_normals ===
+// Wrangle: wr_recompute_N
+// Run over: Points
+// Mountain at high amplitude leaves @N stale. Recompute from prim normals.
+
+vector n = {0, 0, 0};
+int prims[] = pointprims(0, @ptnum);
+foreach (int p; prims) {
+    n += prim_normal(0, p, 0);
+}
+v@N = normalize(n);
+
+// ----------------------------------------------------------------------
+// === SNIPPET: vex_mask_rim ===
+// Wrangle: wr_density_mask  (Run over: Points)
+// Rim mask. Falloff against a user up-axis controlled by chv("camera_dir").
+
+vector cam = chv("camera_dir");
+if (length(cam) < 1e-4) cam = {0, 0, 1};
+cam = normalize(cam);
+float facing = dot(normalize(@N), cam);
+float rim = 1.0 - clamp(facing, 0.0, 1.0);
+@density_mask = pow(rim, chf("rim_sharpness"));        // default 2.0
+// EXPECTED: bright corona on the silhouette, dark on the surface facing the camera.
+
+// ----------------------------------------------------------------------
+// === SNIPPET: vex_mask_dual_noise ===
+// Wrangle: wr_density_mask  (Run over: Points)
+// Two scales of noise multiplied. Low values clip to 0 to give clear gaps.
+
+vector p = @P;
+float big   = fit01(noise(p * chf("low_freq")), -0.2, 1.2);    // continents
+float small = fit01(noise(p * chf("high_freq") + 14.7), 0.0, 1.0); // islands
+float m = clamp(big * 0.7 + small * 0.3, 0.0, 1.0);
+m = pow(m, chf("contrast"));                                   // default 1.6
+@density_mask = m;
+// EXPECTED: organic clumps at two scales. Reproducible — no time dependence.
+
+// ----------------------------------------------------------------------
+// === SNIPPET: vex_mask_distance_curve ===
+// Wrangle: wr_density_mask  (Run over: Points)
+// Requires a curve wired to the second input of this wrangle.
+
+float d = xyzdist(1, @P);                       // distance to nearest curve point
+float falloff = chf("falloff_radius");          // default 0.4
+float m = 1.0 - smooth(0, falloff, d);          // tight band along curve
+@density_mask = clamp(m, 0.0, 1.0);
+// EXPECTED: a clear band along the input curve.
+
+// ----------------------------------------------------------------------
+// === SNIPPET: vex_scatter_inspect ===
+// Wrangle: wr_scatter_inspect  (Run over: Points)
+// Per-scatter-point diagnostic: neighbour count + local density estimate.
+
+float radius = chf("inspect_radius");      // default 0.15
+int near[] = nearpoints(0, @P, radius);
+int n = max(0, len(near) - 1);             // exclude self
+@neighbour_count = n;
+@local_density_estimate = float(n) / (M_PI * radius * radius);
+// EXPECTED: spreadsheet column @neighbour_count is large where the mask
+// was bright and small where the mask was dark — direct proof scatter
+// followed the mask.
+
+// ======================================================================
+// HONESTY:
+//   - All masks must run on the POINT class. If you accidentally pick
+//     "Run over: Primitives", Scatter will silently ignore your mask
+//     because the attribute lives on the wrong class.
+//   - Bring chv()/chf() parameters onto the wrangle UI by clicking
+//     "Create Spare Parameters from Channel References" on the wrangle.

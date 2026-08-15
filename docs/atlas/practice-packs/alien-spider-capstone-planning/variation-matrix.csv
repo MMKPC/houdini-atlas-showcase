@@ -1,0 +1,9 @@
+knob,owner_module,default,min,max,required,what_it_does
+leg_count,curve_skeleton,8,4,12,REQUIRED,Number of legs. 8 is the canonical alien spider count.
+leg_segments,curve_skeleton,64,16,128,REQUIRED,Resample segment count per leg.
+leg_taper_curve_power,curve_skeleton,1.4,0.6,3.0,optional,Power on (1-u) controlling tip taper sharpness.
+carapace_mask_recipe,scatter_surface,dual_noise,rim|dual_noise|distance|combo,,REQUIRED,Which mask recipe drives carapace scatter.
+carapace_total_count,scatter_surface,4000,500,12000,REQUIRED,Force Total Count on the Scatter SOP.
+mask_low_freq,scatter_surface,1.4,0.4,4.0,optional,Big-feature noise frequency in dual-noise recipe.
+mask_high_freq,scatter_surface,5.7,2.0,12.0,optional,Detail noise frequency in dual-noise recipe.
+instance_seed,instance_assignment,1,1,9999,REQUIRED,Seed for choosing per-scatter @instance_index.

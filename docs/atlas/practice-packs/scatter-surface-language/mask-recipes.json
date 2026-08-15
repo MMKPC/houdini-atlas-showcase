@@ -1,0 +1,27 @@
+{
+  "$comment": "Three masking recipes. Pick one. Each maps to a snippet in vex-snippets.vfl.",
+  "recipes": [
+    {
+      "id": "rim",
+      "name": "Rim mask",
+      "snippet_id": "vex_mask_rim",
+      "what_it_looks_like": "Bright corona where the surface bends away from the camera-facing direction; dark elsewhere.",
+      "good_for": "Edge breakup. Carapace plates. Anything where you want scatter to crowd the silhouette."
+    },
+    {
+      "id": "dual_noise",
+      "name": "Dual-noise cluster mask",
+      "snippet_id": "vex_mask_dual_noise",
+      "what_it_looks_like": "Patchy clusters at two scales — large continents of high density, with smaller islands inside.",
+      "good_for": "Organic clumping. Lichen, pustules, rivets, freckle-like detail."
+    },
+    {
+      "id": "distance_from_curve",
+      "name": "Distance-from-curve gradient",
+      "snippet_id": "vex_mask_distance_curve",
+      "what_it_looks_like": "A fall-off band along a user-supplied curve (xyzdist on input 1).",
+      "good_for": "Wound trails. Vein routing. Anything aligned to a sketched stroke."
+    }
+  ],
+  "honesty": "All three recipes are deterministic — same parameters → same mask. Reproducibility is part of the proof."
+}

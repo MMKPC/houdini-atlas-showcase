@@ -1,0 +1,206 @@
+{
+  "generatedAt": "2026-05-03T10:45:27.260Z",
+  "honesty": "Each pack zip contains only the listed plain-text files. No .hip files, no binary Houdini scenes, no SideFX assets are included. Learners build the Houdini file locally.",
+  "packs": [
+    {
+      "slug": "sop-data-foundations",
+      "label": "SOP Data Foundations Starter Pack",
+      "zip": {
+        "href": "/practice-packs/sop-data-foundations/sop-data-foundations.zip",
+        "sizeBytes": 10437
+      },
+      "files": [
+        {
+          "name": "LICENSE.md",
+          "href": "/practice-packs/sop-data-foundations/LICENSE.md",
+          "sizeBytes": 1057
+        },
+        {
+          "name": "README.md",
+          "href": "/practice-packs/sop-data-foundations/README.md",
+          "sizeBytes": 4222
+        },
+        {
+          "name": "attribute-manifest.csv",
+          "href": "/practice-packs/sop-data-foundations/attribute-manifest.csv",
+          "sizeBytes": 857
+        },
+        {
+          "name": "checklist.md",
+          "href": "/practice-packs/sop-data-foundations/checklist.md",
+          "sizeBytes": 2562
+        },
+        {
+          "name": "houdini-build-plan.py",
+          "href": "/practice-packs/sop-data-foundations/houdini-build-plan.py",
+          "sizeBytes": 5914
+        },
+        {
+          "name": "node-plan.json",
+          "href": "/practice-packs/sop-data-foundations/node-plan.json",
+          "sizeBytes": 3097
+        },
+        {
+          "name": "proof-template.md",
+          "href": "/practice-packs/sop-data-foundations/proof-template.md",
+          "sizeBytes": 1990
+        },
+        {
+          "name": "vex-snippets.vfl",
+          "href": "/practice-packs/sop-data-foundations/vex-snippets.vfl",
+          "sizeBytes": 1856
+        }
+      ]
+    },
+    {
+      "slug": "curve-skeleton-alien-limb",
+      "label": "Curve Skeleton / Alien Limb Starter Pack",
+      "zip": {
+        "href": "/practice-packs/curve-skeleton-alien-limb/curve-skeleton-alien-limb.zip",
+        "sizeBytes": 9898
+      },
+      "files": [
+        {
+          "name": "LICENSE.md",
+          "href": "/practice-packs/curve-skeleton-alien-limb/LICENSE.md",
+          "sizeBytes": 940
+        },
+        {
+          "name": "README.md",
+          "href": "/practice-packs/curve-skeleton-alien-limb/README.md",
+          "sizeBytes": 3608
+        },
+        {
+          "name": "checklist.md",
+          "href": "/practice-packs/curve-skeleton-alien-limb/checklist.md",
+          "sizeBytes": 2508
+        },
+        {
+          "name": "houdini-build-plan.py",
+          "href": "/practice-packs/curve-skeleton-alien-limb/houdini-build-plan.py",
+          "sizeBytes": 4644
+        },
+        {
+          "name": "node-plan.json",
+          "href": "/practice-packs/curve-skeleton-alien-limb/node-plan.json",
+          "sizeBytes": 3034
+        },
+        {
+          "name": "points.csv",
+          "href": "/practice-packs/curve-skeleton-alien-limb/points.csv",
+          "sizeBytes": 201
+        },
+        {
+          "name": "proof-template.md",
+          "href": "/practice-packs/curve-skeleton-alien-limb/proof-template.md",
+          "sizeBytes": 1829
+        },
+        {
+          "name": "vex-snippets.vfl",
+          "href": "/practice-packs/curve-skeleton-alien-limb/vex-snippets.vfl",
+          "sizeBytes": 2698
+        }
+      ]
+    },
+    {
+      "slug": "scatter-surface-language",
+      "label": "Scatter Surface Language Starter Pack",
+      "zip": {
+        "href": "/practice-packs/scatter-surface-language/scatter-surface-language.zip",
+        "sizeBytes": 9919
+      },
+      "files": [
+        {
+          "name": "LICENSE.md",
+          "href": "/practice-packs/scatter-surface-language/LICENSE.md",
+          "sizeBytes": 845
+        },
+        {
+          "name": "README.md",
+          "href": "/practice-packs/scatter-surface-language/README.md",
+          "sizeBytes": 3562
+        },
+        {
+          "name": "checklist.md",
+          "href": "/practice-packs/scatter-surface-language/checklist.md",
+          "sizeBytes": 2675
+        },
+        {
+          "name": "houdini-build-plan.py",
+          "href": "/practice-packs/scatter-surface-language/houdini-build-plan.py",
+          "sizeBytes": 4154
+        },
+        {
+          "name": "mask-recipes.json",
+          "href": "/practice-packs/scatter-surface-language/mask-recipes.json",
+          "sizeBytes": 1228
+        },
+        {
+          "name": "node-plan.json",
+          "href": "/practice-packs/scatter-surface-language/node-plan.json",
+          "sizeBytes": 2942
+        },
+        {
+          "name": "proof-template.md",
+          "href": "/practice-packs/scatter-surface-language/proof-template.md",
+          "sizeBytes": 1888
+        },
+        {
+          "name": "vex-snippets.vfl",
+          "href": "/practice-packs/scatter-surface-language/vex-snippets.vfl",
+          "sizeBytes": 3184
+        }
+      ]
+    },
+    {
+      "slug": "alien-spider-capstone-planning",
+      "label": "Alien Spider Capstone Planning Pack",
+      "zip": {
+        "href": "/practice-packs/alien-spider-capstone-planning/alien-spider-capstone-planning.zip",
+        "sizeBytes": 10774
+      },
+      "files": [
+        {
+          "name": "LICENSE.md",
+          "href": "/practice-packs/alien-spider-capstone-planning/LICENSE.md",
+          "sizeBytes": 879
+        },
+        {
+          "name": "README.md",
+          "href": "/practice-packs/alien-spider-capstone-planning/README.md",
+          "sizeBytes": 3945
+        },
+        {
+          "name": "capstone-architecture.md",
+          "href": "/practice-packs/alien-spider-capstone-planning/capstone-architecture.md",
+          "sizeBytes": 3226
+        },
+        {
+          "name": "houdini-build-plan.py",
+          "href": "/practice-packs/alien-spider-capstone-planning/houdini-build-plan.py",
+          "sizeBytes": 4072
+        },
+        {
+          "name": "network-architecture.json",
+          "href": "/practice-packs/alien-spider-capstone-planning/network-architecture.json",
+          "sizeBytes": 2799
+        },
+        {
+          "name": "proof-contract.md",
+          "href": "/practice-packs/alien-spider-capstone-planning/proof-contract.md",
+          "sizeBytes": 2235
+        },
+        {
+          "name": "variation-matrix.csv",
+          "href": "/practice-packs/alien-spider-capstone-planning/variation-matrix.csv",
+          "sizeBytes": 865
+        },
+        {
+          "name": "vex-snippets.vfl",
+          "href": "/practice-packs/alien-spider-capstone-planning/vex-snippets.vfl",
+          "sizeBytes": 2777
+        }
+      ]
+    }
+  ]
+}

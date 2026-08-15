@@ -1,0 +1,58 @@
+// Houdini Atlas — Alien Spider Capstone planning pack
+// Capstone-specific VEX. Foundations live in the prior packs.
+//
+// === SNIPPET: vex_freeze_leg_id ===
+// Wrangle: wr_leg_id (inside the per-leg branch of the legs for-loop)
+// Run over: Detail (because we want one assignment per iteration), or
+// Points if you prefer per-point — the value is the same per leg.
+// Purpose: freeze a stable @leg_id BEFORE any merge.
+
+int leg = detail(0, "iteration", 0);   // for-loop iteration value
+i@leg_id = leg;
+// EXPECTED: spreadsheet on the merged legs output shows 8 distinct values
+// of @leg_id (0..7), every leg's points carrying its own value.
+
+// ----------------------------------------------------------------------
+// === SNIPPET: vex_mask_combinator ===
+// Wrangle: wr_mask_combinator (Run over: Points)
+// Inputs: input 0 = surface with @density_mask_a; input 1 (optional)
+// = same surface evaluated through a second mask recipe writing
+// @density_mask_b. We combine via channel-controlled mode.
+
+float a = @density_mask;
+float b = 0;
+if (@OpInput2 != -1) {
+    b = point(1, "density_mask", @ptnum);  // assumes 1:1 point correspondence
+}
+int mode = chi("combine_mode");   // 0=max, 1=min, 2=multiply, 3=add_clamp
+float m = a;
+if (mode == 0) m = max(a, b);
+else if (mode == 1) m = min(a, b);
+else if (mode == 2) m = a * b;
+else if (mode == 3) m = clamp(a + b, 0.0, 1.0);
+@density_mask = m;
+// EXPECTED: @density_mask remains a single point-class float in [0,1]
+// so downstream Scatter still sees one density attribute by name.
+
+// ----------------------------------------------------------------------
+// === SNIPPET: vex_instance_handoff ===
+// Wrangle: instance_assignment (Run over: Points; ON THE SCATTER OUTPUT)
+// Purpose: assign each scatter point an @instance_index in [0, n_instances)
+// deterministically from a seed parameter.
+
+int n_instances = chi("instance_count");        // pulled from variation-matrix.csv
+int seed = chi("instance_seed");
+if (n_instances <= 0) n_instances = 1;          // never divide by zero
+int idx = (random(@ptnum + seed * 9973) * n_instances * 32) % n_instances;
+i@instance_index = abs(idx);
+// EXPECTED: @instance_index column on the spreadsheet has values strictly
+// in [0, n_instances). Min and max columns prove the bound; same seed
+// reproduces the same column.
+
+// ----------------------------------------------------------------------
+// === HONESTY ===
+// All three snippets are deterministic — same inputs and seed → same
+// output bytes. If you cannot reproduce a row exactly across two runs,
+// something upstream is non-deterministic (commonly: Mountain SOP element
+// seed referencing $F, or a wrangle reading frame-dependent `chramp`).
+// Fix the upstream cause; do not add randomness here to mask it.

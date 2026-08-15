@@ -1,0 +1,9 @@
+attribute,class,type,size,where_introduced,why_it_matters
+P,point,vector,3,grid1,Point position. Always present.
+N,point,vector,3,wr_height (computed),Used by viewport shading; copy from cross-product if missing.
+height,point,float,1,wr_height,Toy data attribute. First proof that VEX wrote into the spreadsheet.
+height,primitive,float,1,promote_pt_to_prim_avg,Proves the same name can live on different classes simultaneously.
+Cd,point,vector,3,wr_color,Maps height to RGB so viewport encodes data not magic colour.
+ptnum,point,int (runtime),1,grid1,Runtime row index on the Points tab. NOT a stable id; reorders on point deletion.
+primnum,primitive,int (runtime),1,grid1,Runtime row index on the Primitives tab. Same caveat as ptnum.
+id,point,int,1,optional,Stable id. Add 'i@id = @ptnum;' once before any deletion if you need cross-frame correspondence.

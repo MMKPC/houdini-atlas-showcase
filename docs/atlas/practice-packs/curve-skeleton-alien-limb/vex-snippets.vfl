@@ -1,0 +1,65 @@
+// Houdini Atlas — Curve Skeleton / Alien Limb starter pack
+// Three VEX snippets. Each maps to one Attribute Wrangle in the node plan.
+//
+// === SNIPPET: vex_segment_id ===
+// Wrangle name: wr_seg_id
+// Run over: Points
+// Purpose: freeze a stable @seg_id BEFORE any later deletion or reorder.
+// Without this, "@ptnum" reorders silently and your downstream Copy to Points
+// scrambles the limb.
+
+i@seg_id = @ptnum;
+// EXPECTED: spreadsheet shows @seg_id 0..63 with no gaps and no duplicates.
+
+// === SNIPPET: vex_robust_orient ===
+// Wrangle name: wr_orient
+// Run over: Points
+// Purpose: build a quaternion @orient per point that DOES NOT flip when
+// the curve passes through a degenerate "up vector ~= tangent" region.
+//
+// The standard "up = (0,1,0)" trick fails when the tangent points along
+// (0,1,0) or (0,-1,0) — cross(tangent, up) collapses to zero, the side
+// vector is undefined, and the next segment flips 180 degrees.
+//
+// Fix: detect the collapse and switch to a different up axis BEFORE the
+// orthonormal frame is built.
+
+vector tangent = normalize(@N);          // resample wrote @N if "Output PointAttribs N" was on
+vector up = chv("up_axis");              // expose as a Wrangle parameter (default 0,1,0)
+if (length(up) < 1e-4) up = {0, 1, 0};
+
+// Detect collapse: |t × up| close to zero ⇒ tangent is parallel to up.
+vector side = cross(tangent, up);
+if (length(side) < 0.05) {
+    // Pick a different up axis — guaranteed non-parallel to ANY single axis.
+    up = abs(tangent.y) < 0.9 ? set(0, 1, 0) : set(1, 0, 0);
+    side = cross(tangent, up);
+}
+side = normalize(side);
+vector new_up = normalize(cross(side, tangent));
+
+// Build matrix3 then quaternion.
+matrix3 m = set(side, new_up, tangent);
+p@orient = quaternion(m);
+v@N = tangent;
+// EXPECTED: parameter-sweep "up_axis" through (0,1,0) → (0,0,1) and the limb
+// must NOT flip 180° at any point along the curve.
+
+// === SNIPPET: vex_segment_width ===
+// Wrangle name: wr_width_scale
+// Run over: Points
+// Purpose: drive Copy to Points scale from the per-segment width.
+// We do not have @width on the resampled curve directly — we re-create it
+// from @curveu using a smooth taper that matches the source CSV's profile
+// (1.00 at base → ~0.22 at tip).
+
+float u = clamp(@curveu, 0.0, 1.0);
+float profile = fit01(pow(1.0 - u, 1.4), 0.22, 1.0);
+@pscale = profile;
+// EXPECTED: capsules near the base are at full radius; capsules near the
+// tip taper to roughly 22% radius.
+
+// === HONESTY ===
+// These snippets assume the resample SOP already wrote a valid @N (Output
+// PointAttribs: N enabled). If @N is missing, the orient frame is undefined
+// — fix the resample, do not patch around it here.

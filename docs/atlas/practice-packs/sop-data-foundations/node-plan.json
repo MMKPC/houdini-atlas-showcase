@@ -1,0 +1,93 @@
+{
+  "$comment": "Houdini Atlas — SOP Data Foundations starter pack node plan. This is a plan, not a hip file. Build it by hand inside a Geometry SOP in Houdini.",
+  "version": "1.0",
+  "module": "module.sop_data_foundations",
+  "context": "sop",
+  "container": {
+    "type": "geo",
+    "name": "geo_sop_foundations"
+  },
+  "nodes": [
+    {
+      "name": "grid1",
+      "type": "grid",
+      "parameters": {
+        "rows": 20,
+        "cols": 20,
+        "sizex": 10,
+        "sizey": 10,
+        "orient": "zx"
+      },
+      "rationale": "Predictable point + primitive count. 400 pts / 361 prims is easy to verify on the spreadsheet."
+    },
+    {
+      "name": "wr_height",
+      "type": "attribwrangle",
+      "input": "grid1",
+      "parameters": {
+        "class": "point",
+        "snippet_ref": "vex_height_field"
+      },
+      "rationale": "Add @height. First place the spreadsheet acquires a non-default float attribute."
+    },
+    {
+      "name": "wr_color",
+      "type": "attribwrangle",
+      "input": "wr_height",
+      "parameters": {
+        "class": "point",
+        "snippet_ref": "vex_color_from_height"
+      },
+      "rationale": "Visualise @height on @Cd so the viewport encodes the data row, not magic colour."
+    },
+    {
+      "name": "promote_pt_to_prim_avg",
+      "type": "attribpromote",
+      "input": "wr_color",
+      "parameters": {
+        "inname": "height",
+        "fromclass": "point",
+        "toclass": "primitive",
+        "method": "average"
+      },
+      "rationale": "Demonstrates point->prim with averaging — proves attribute lives on primitive class now."
+    },
+    {
+      "name": "promote_prim_to_pt_max",
+      "type": "attribpromote",
+      "input": "promote_pt_to_prim_avg",
+      "parameters": {
+        "inname": "height",
+        "fromclass": "primitive",
+        "toclass": "point",
+        "method": "maximum"
+      },
+      "rationale": "Demonstrates prim->point with maximum — visible stair-stepping at island borders."
+    },
+    {
+      "name": "OUT_data_view",
+      "type": "null",
+      "input": "wr_color",
+      "rationale": "First named OUT. The 'raw data' branch — points with original wrangle output."
+    },
+    {
+      "name": "OUT_render_ready",
+      "type": "null",
+      "input": "promote_prim_to_pt_max",
+      "rationale": "Second named OUT. The 'promoted twice' branch — for downstream comparisons."
+    }
+  ],
+  "expected_spreadsheet": {
+    "points_tab_rows": 400,
+    "primitives_tab_rows": 361,
+    "vertices_tab_rows_minimum": 1444,
+    "attributes_on_OUT_data_view": ["P", "N", "@height", "Cd"],
+    "attributes_on_OUT_render_ready": ["P", "N", "@height", "Cd"],
+    "notes": [
+      "@ptnum is a row index on the Points tab — not a stable id.",
+      "@primnum is a row index on the Primitives tab — same caveat.",
+      "After promote->average, the @height column on the Primitives tab is smoother than the original."
+    ]
+  },
+  "honesty": "Parameter names in your Houdini build may differ slightly across versions. Treat any mismatch as part of the learning, not an error in this plan."
+}

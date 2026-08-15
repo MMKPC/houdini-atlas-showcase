@@ -1,0 +1,68 @@
+{
+  "$comment": "Houdini Atlas — Alien Spider Capstone planning pack. Cross-module composition plan. Build by hand inside a single subnet.",
+  "version": "1.0",
+  "module": "module.alien_spider_capstone",
+  "context": "sop-subnet",
+  "subnet": {
+    "name": "subnet_alien_spider_v1",
+    "inputs": [
+      { "index": 0, "name": "in_optional_path_curve",
+        "rationale": "If wired, the spider follows this path; if absent, the spider is in rest pose at origin." }
+    ],
+    "outputs": [
+      { "index": 0, "name": "OUT_alien_spider_rest" },
+      { "index": 1, "name": "OUT_alien_spider_sim_cache_optional" }
+    ]
+  },
+  "subgraph": [
+    {
+      "name": "controls",
+      "type": "null",
+      "rationale": "Single Null exposing every variation knob from variation-matrix.csv as spare parameters. The rest of the network reads ch('../controls/...')."
+    },
+    {
+      "name": "legs",
+      "type": "subnet",
+      "consumes_pack": "curve-skeleton-alien-limb",
+      "loop_strategy": {
+        "approach": "for-loop-each-leg-from-curve-template",
+        "iteration_attribute": "@leg_id",
+        "stable_id_strategy": "set i@leg_id = leg_index BEFORE any per-leg deletion or transform."
+      },
+      "rationale": "One leg curve per leg, all 8 unioned with leg_id frozen so downstream filters can never scramble."
+    },
+    {
+      "name": "carapace_surface",
+      "type": "subnet",
+      "consumes_pack": "scatter-surface-language",
+      "carapace_recipe_default": "dual_noise",
+      "rationale": "Sphere → mountain → density mask → scatter. Mask combinator (vex_mask_combinator) optionally combines two recipes."
+    },
+    {
+      "name": "instance_assignment",
+      "type": "attribwrangle",
+      "snippet_ref": "vex_instance_handoff",
+      "rationale": "Writes @instance_index per scatter point. Bounded modulo so out-of-range never reaches the renderer."
+    },
+    {
+      "name": "merge_skeleton",
+      "type": "merge",
+      "inputs": ["legs", "carapace_surface", "instance_assignment"],
+      "rationale": "Single merge for downstream consumption. Keep separate output nulls for legs vs carapace if you need them isolated for proofs."
+    },
+    {
+      "name": "OUT_alien_spider_rest",
+      "type": "output",
+      "input": "merge_skeleton"
+    }
+  ],
+  "data_flow": {
+    "summary": [
+      "controls → every other node via channel references",
+      "legs → carries @leg_id (1..8) and @seg_id (0..63 per leg)",
+      "carapace_surface → carries @density_mask, @neighbour_count for proofs",
+      "instance_assignment → adds @instance_index to scatter output"
+    ]
+  },
+  "honesty": "This is a planning artifact. The actual subnet must still be built by the learner. Parameter names and even node types may differ slightly across Houdini versions."
+}

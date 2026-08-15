@@ -1,0 +1,43 @@
+// Houdini Atlas — SOP Data Foundations starter pack
+// Three small VEX snippets. Each maps to one Attribute Wrangle in the
+// node plan. Class is the Wrangle's "Run over" mode.
+//
+// These snippets are deliberately simple. They exist so the proof you
+// produce on the Geometry Spreadsheet has unambiguous, verifiable rows.
+//
+// === SNIPPET: vex_height_field ===
+// Wrangle name: wr_height
+// Run over: Points
+// Purpose: write a low-frequency height attribute every point can see on the spreadsheet.
+
+vector p = @P;
+float n = noise(p * 0.35);          // unit-ish low-frequency noise
+@height = fit01(n, -1.0, 1.0);      // explicit range so spreadsheet rows are predictable
+// EXPECTED ON SPREADSHEET (Points tab):
+//   - new column @height appears
+//   - values inside [-1.0, 1.0]
+//   - approximately gaussian-shaped distribution
+
+// === SNIPPET: vex_color_from_height ===
+// Wrangle name: wr_color
+// Run over: Points
+// Purpose: encode @height onto @Cd so the viewport tells the truth about the data,
+// not a separate visual signal.
+
+float h01 = fit(@height, -1.0, 1.0, 0.0, 1.0);
+@Cd = set(h01, h01 * 0.6, 1.0 - h01); // simple cool-warm ramp
+// EXPECTED ON SPREADSHEET:
+//   - @Cd column written, three components
+//   - viewport color matches the spreadsheet column on every point
+
+// === SNIPPET: vex_stable_id (optional, for downstream modules) ===
+// Wrangle name: wr_stable_id (insert before any point deletion)
+// Run over: Points
+// Purpose: capture a stable id so downstream nodes (Solver, Copy to Points)
+// can refer to "the same point" across frames or after deletion.
+
+if (!hasattrib(0, "point", "id")) {
+    i@id = @ptnum;     // freeze the current ptnum into a stable id
+}
+// HONESTY: this only works if you wire it BEFORE any node that deletes or
+// reorders points. If you add it later, the ids you froze are already different.

@@ -1,0 +1,75 @@
+{
+  "$comment": "Houdini Atlas — Scatter Surface Language starter pack node plan. Build by hand inside a Geometry SOP.",
+  "version": "1.0",
+  "module": "module.scatter_surface_language",
+  "context": "sop",
+  "container": { "type": "geo", "name": "geo_scatter_surface" },
+  "nodes": [
+    {
+      "name": "sphere",
+      "type": "sphere",
+      "parameters": { "type": "polygon", "freq": 60 },
+      "rationale": "Predictable polygon sphere so prim count is reproducible across learners."
+    },
+    {
+      "name": "mountain",
+      "type": "mountain",
+      "input": "sphere",
+      "parameters": { "amp": 0.4, "elementsize": 0.8 },
+      "rationale": "Adds organic relief without time dependence."
+    },
+    {
+      "name": "wr_recompute_N",
+      "type": "attribwrangle",
+      "input": "mountain",
+      "parameters": { "class": "point", "snippet_ref": "vex_recompute_normals" },
+      "rationale": "Mountain leaves @N stale at high amplitude. Recompute before scatter."
+    },
+    {
+      "name": "wr_density_mask",
+      "type": "attribwrangle",
+      "input": "wr_recompute_N",
+      "parameters": { "class": "point", "snippet_ref": "<RECIPE>" },
+      "rationale": "Class MUST be point. The bug this module fixes is feeding a primitive-class mask to Scatter."
+    },
+    {
+      "name": "wr_visualise_mask",
+      "type": "attribwrangle",
+      "input": "wr_density_mask",
+      "parameters": { "class": "point", "snippet_inline": "@Cd = set(@density_mask, @density_mask, @density_mask);" },
+      "rationale": "Cheap visualisation so the viewport tells the truth before Scatter runs."
+    },
+    {
+      "name": "scatter",
+      "type": "scatter",
+      "input": "wr_density_mask",
+      "parameters": {
+        "ndensity": 1,
+        "densityattrib": "density_mask",
+        "totalcount": 4000,
+        "seed": 1
+      },
+      "rationale": "Reads the point-class density attribute. Total count is forced so reproducibility is the contract, not a side-effect."
+    },
+    {
+      "name": "wr_scatter_inspect",
+      "type": "attribwrangle",
+      "input": "scatter",
+      "parameters": { "class": "point", "snippet_ref": "vex_scatter_inspect" },
+      "rationale": "Per-point neighbour count + local density estimate, so the spreadsheet PROVES the mask drove density."
+    },
+    {
+      "name": "OUT_scattered_surface",
+      "type": "null",
+      "input": "wr_scatter_inspect",
+      "rationale": "Single output."
+    }
+  ],
+  "expected_spreadsheet": {
+    "wr_density_mask_attribs_points": ["P", "N", "@density_mask"],
+    "wr_density_mask_attribs_prims": ["NO @density_mask HERE — that is the failure mode"],
+    "scatter_output_points": 4000,
+    "wr_scatter_inspect_attribs_points": ["P", "N", "@neighbour_count", "@local_density_estimate"]
+  },
+  "honesty": "Scatter parameter names differ across versions; verify before pasting the build plan. The bug this module fixes is class confusion, not a fancy aesthetic."
+}

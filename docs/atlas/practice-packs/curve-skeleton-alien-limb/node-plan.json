@@ -1,0 +1,83 @@
+{
+  "$comment": "Houdini Atlas — Curve Skeleton / Alien Limb starter pack node plan. Build by hand inside a Geometry SOP.",
+  "version": "1.0",
+  "module": "module.curve_skeleton",
+  "context": "sop",
+  "container": { "type": "geo", "name": "geo_alien_limb" },
+  "nodes": [
+    {
+      "name": "csv_import",
+      "type": "tableimport",
+      "parameters": { "file": "points.csv", "headerlines": 1 },
+      "rationale": "Same control points for every learner so proof is reproducible."
+    },
+    {
+      "name": "make_polyline",
+      "type": "add",
+      "input": "csv_import",
+      "parameters": { "switcher": "polyline", "groupbyattr": "all" },
+      "rationale": "Connect the 8 points into a single open polyline."
+    },
+    {
+      "name": "resample",
+      "type": "resample",
+      "input": "make_polyline",
+      "parameters": {
+        "method": "by_segments",
+        "segments": 64,
+        "outputN": 1,
+        "computeu": 1
+      },
+      "rationale": "64 segments = 64 stable knuckles. Output @N + @curveu so downstream wrangles do not have to recompute."
+    },
+    {
+      "name": "wr_seg_id",
+      "type": "attribwrangle",
+      "input": "resample",
+      "parameters": { "class": "point", "snippet_ref": "vex_segment_id" },
+      "rationale": "Freeze a stable @seg_id BEFORE any deletion."
+    },
+    {
+      "name": "wr_orient",
+      "type": "attribwrangle",
+      "input": "wr_seg_id",
+      "parameters": { "class": "point", "snippet_ref": "vex_robust_orient" },
+      "rationale": "Robust quaternion orient that does not flip on degenerate up vector."
+    },
+    {
+      "name": "wr_width_scale",
+      "type": "attribwrangle",
+      "input": "wr_orient",
+      "parameters": { "class": "point", "snippet_ref": "vex_segment_width" },
+      "rationale": "Map width to @pscale so Copy to Points scales each capsule non-uniformly."
+    },
+    {
+      "name": "seg_capsule",
+      "type": "tube",
+      "parameters": { "type": "polygon", "endcaps": "triangulated",
+        "radius": 0.05, "height": 1.0, "orientation": "y" },
+      "rationale": "Cheap capsule — geometry first, instancing later."
+    },
+    {
+      "name": "copy_to_points",
+      "type": "copytopoints",
+      "input": ["seg_capsule", "wr_width_scale"],
+      "parameters": { "pack": 0, "transformusing": "orient_pscale" },
+      "rationale": "Drop one capsule per resampled point, transformed by @orient + @pscale."
+    },
+    {
+      "name": "OUT_alien_limb",
+      "type": "null",
+      "input": "copy_to_points",
+      "rationale": "Single output for downstream capstone consumption."
+    }
+  ],
+  "expected_spreadsheet": {
+    "csv_import_points": 8,
+    "resample_points": 64,
+    "attributes_after_wr_orient": ["P", "N", "@seg_id", "@orient (4-vector)", "@curveu"],
+    "attributes_after_wr_width_scale": ["P", "N", "@seg_id", "@orient", "@pscale"],
+    "copy_to_points_total_prims_min": 64
+  },
+  "honesty": "Capsule poly counts are intentionally low. The proof is orient stability + segment id stability, not surface quality."
+}
