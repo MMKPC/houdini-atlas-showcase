@@ -1,8 +1,8 @@
 # Houdini Atlas
 
-Private portfolio presentation of Houdini Atlas, an interactive procedural-systems reference and technical-direction prototype.
+Public portfolio presentation of Houdini Atlas, an interactive procedural-systems reference and technical-direction prototype.
 
-The private showcase mirror contains the built browser experience, selected visual evidence, and the portfolio case-study page. The original source, database, milestone reports, and development package remain private.
+The controlled showcase contains the built browser experience, selected visual evidence, and the portfolio case-study page. The original source, database, milestone reports, and development package remain private.
 
 ## What it demonstrates
 
@@ -18,4 +18,4 @@ This mirror does not claim to run Houdini, parse `.hip` files, or certify produc
 
 ## Studio control
 
-This repository is now a private MMKPC Studios showcase artifact for later integration into MMKProspects.com. The current access policy is in `LICENSE`, credential handling is in `SECURITY.md`, and the release gate is `scripts/validate_studio_manifest.ps1`.
+This repository is the interactive demonstration layer referenced by MMKProspects.com. The current access policy is in `LICENSE`, credential handling is in `SECURITY.md`, and the release gate is `scripts/validate_studio_manifest.ps1`.
